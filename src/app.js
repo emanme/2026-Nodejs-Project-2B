@@ -12,7 +12,13 @@ const app = express();
 app.use(helmet());
 
 // ISSUE-0031: CORS too open in release
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:3000'], 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 
 // ISSUE-0024: server can crash on invalid JSON in release (naive parser)
 app.use((req, res, next) => {
