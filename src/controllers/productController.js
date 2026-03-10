@@ -13,10 +13,17 @@ async function create(req, res) {
 
 async function update(req, res) {
   const { id } = req.validated.params;
-  const p = await productModel.update(id, req.validated.body);
-  if (!p) return res.status(404).send('Product not found'); // ISSUE-0016 not standardized
+  const p = await 
+  productModel.update(id, 
+  req.validated.body);
+  if (!p) {
+    return res.status(404).json({
+    error: "Product not found"
+    });
+  }
   return res.json(p);
 }
+ 
 
 async function remove(req, res) {
   // ISSUE-0018: uses wrong param name
