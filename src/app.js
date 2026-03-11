@@ -37,6 +37,31 @@ app.use('/products', products);
 app.use('/orders', orders);
 
 // ISSUE-0016/0030: error handling inconsistent and stack logging not improved
+// Improved error handling
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  const message = err.message || 'Internal Server Error';
+
+  // Log the full error stack (useful for debugging)
+  console.error(err.stack);
+
+  // Send detailed error only in development
+  if (process.env.NODE_ENV === 'development') {
+    res.status(status).json({
+      error: {
+        message,
+        stack: err.stack,
+      },
+    });
+  } else {
+    // In production, hide stack
+    res.status(status).json({
+      error: {
+        message,
+      },
+    });
+  }
+});
 app.use((err, req, res, next) => {
   res.status(500).send('Server error');
 });
