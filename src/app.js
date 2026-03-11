@@ -39,7 +39,15 @@ app.use((req, res, next) => {
 // ISSUE-0023: request logging missing in release (no morgan)
 
 // ISSUE-0035: /health endpoint missing in release
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+      status: 'OK',
+      message: 'Server is running'
+  });
+});
 
+// Existing Routes
 app.use('/users', users);
 app.use('/products', products);
 app.use('/orders', orders);
