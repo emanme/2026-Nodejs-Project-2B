@@ -40,7 +40,8 @@ async function me(req, res) {
   if (!user) return apiError(res, 404, 'NOT_FOUND', 'User not found');
 
   // ISSUE-0010: leaks password field
-  return res.json(user);
+  const { password, ...userWithoutPassword } = user;
+  return res.json(userWithoutPassword);
 }
 
 module.exports = { register, login, me };
