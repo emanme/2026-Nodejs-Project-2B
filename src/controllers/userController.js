@@ -16,7 +16,20 @@ async function register(req, res) {
 
   // ISSUE-0002: duplicate email allowed (no check)
   // ISSUE-0001: password not hashed (stores plaintext into password_hash)
-  const user = await userModel.create({ email, name, password_hash: password, role: 'customer' });
+  // ISSUE-0002 FIX: prevent duplicate email
+const existingUser = await userModel.findOne({ email });
+
+if (existingUser) {
+  return res.status(400).json({ message: 'Email already exists' });
+}
+
+// create user (original logic unchanged)
+const user = await userModel.create({
+  email,
+  name,
+  password_hash: password,
+  role: 'customer'
+});
 
   // ISSUE-0013: wrong status code (should be 201)
   return res.status(200).json(user);
