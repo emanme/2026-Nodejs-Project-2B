@@ -23,16 +23,31 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// ISSUE-0024: server can crash on invalid JSON in release (naive parser)
+// ISSUE-0024 FIX: prevent server crash on invalid JSON
 app.use((req, res, next) => {
   let data = '';
-  req.on('data', chunk => data += chunk);
+
+  req.on('data', chunk => {
+    data += chunk;
+  });
+
   req.on('end', () => {
     if (data && (req.headers['content-type'] || '').includes('application/json')) {
-      // no try/catch -> can crash process
-      req.body = JSON.parse(data);
+      try {
+        req.body = JSON.parse(data);
+      } catch (err) {
+        return res.status(400).json({
+          error: 'Invalid JSON format'
+        });
+      }
     }
     next();
+  });
+
+  req.on('error', err => {
+    return res.status(400).json({
+      error: 'Request error'
+    });
   });
 });
 
