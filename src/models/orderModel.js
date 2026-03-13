@@ -18,8 +18,7 @@ const orderModel = {
         if (it.quantity < 0) throw new Error(`Invalid quantity for product ${it.product_id}`);
 
 <<<<<<< HEAD
-        // BUG: ignores quantity
-        total += Number(p.price) * it.quantity;
+       
 =======
         // FIX TOTAL ORDER COMPUTED CORRECTLY
         total += Number(p.price) * it.quantity;
