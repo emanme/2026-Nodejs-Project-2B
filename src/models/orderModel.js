@@ -19,7 +19,7 @@ const orderModel = {
 
 //<<<<<<< HEAD
        
-=======
+//=======
         // FIX TOTAL ORDER COMPUTED CORRECTLY
         total += Number(p.price) * it.quantity;
         
