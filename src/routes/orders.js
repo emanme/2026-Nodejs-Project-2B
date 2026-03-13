@@ -18,4 +18,10 @@ const createSchema = z.object({
 router.post('/', auth, create); // ISSUE-0020 + ISSUE-0009
 router.get('/', auth, list);
 
+//the right code of 0020
+router.post('/', auth, validate(createSchema), create); // ISSUE-0020 fixed
+
+// Get Orders
+router.get('/', auth, list);
+
 module.exports = router;
