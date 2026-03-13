@@ -12,6 +12,9 @@ const orderModel = {
 
       for (const it of items) {
         const p = await productModel.findById(it.product_id);
+        await conn.query(
+          'UPDATE products SET stock = stock - ? WHERE id = ?',
+          [it.quantity, it.product_id]);
         if (!p) throw new Error(`Product not found: ${it.product_id}`);
 
         // ISSUE-0009: missing robust validation for orders in release
