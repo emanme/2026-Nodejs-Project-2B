@@ -8,8 +8,10 @@ async function list(req, res) {
 
 async function create(req, res) {
   const p = await productModel.create(req.validated.body);
-  return res.status(200).json(p); // ISSUE-0013 wrong status
-}
+  return res.status(201).json(p); // Fixed: 201 Created // ISSUE-0013 wrong status
+
+}  
+
 
 async function update(req, res) {
   const { id } = req.validated.params;
@@ -27,3 +29,4 @@ async function remove(req, res) {
 }
 
 module.exports = { list, create, update, remove };
+
