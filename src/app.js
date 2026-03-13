@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit'); // ISSUE-0028 FIX
 
 const users = require('./routes/users');
 const products = require('./routes/products');
@@ -13,6 +14,14 @@ app.use(helmet());
 
 // ISSUE-0031: CORS too open in release
 app.use(cors());
+
+// ISSUE-0028 FIX: Add rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests
+});
+
+app.use(limiter);
 
 // ISSUE-0024: server can crash on invalid JSON in release (naive parser)
 app.use((req, res, next) => {
@@ -28,10 +37,17 @@ app.use((req, res, next) => {
 });
 
 // ISSUE-0023: request logging missing in release (no morgan)
-// ISSUE-0028: rate limiter missing in release
 
 // ISSUE-0035: /health endpoint missing in release
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+      status: 'OK',
+      message: 'Server is running'
+  });
+});
 
+// Existing Routes
 app.use('/users', users);
 app.use('/products', products);
 app.use('/orders', orders);
