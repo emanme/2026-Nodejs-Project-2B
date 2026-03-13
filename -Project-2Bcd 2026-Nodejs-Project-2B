@@ -1,0 +1,37 @@
+[35mISSUES.md[m[36m:[m[32m11[m[36m:[m0006 Missing try/catch / error handling in [1;31muser[m controller
+[35mISSUES.md[m[36m:[m[32m22[m[36m:[m0017 Missing GET [1;31muser[m by ID (admin-only) OR route returns wrong [1;31muser[m
+[35mREADME.md[m[36m:[m[32m27[m[36m:[m- `POST /[1;31muser[ms/register`
+[35mREADME.md[m[36m:[m[32m28[m[36m:[m- `POST /[1;31muser[ms/login`
+[35mREADME.md[m[36m:[m[32m29[m[36m:[m- `GET /[1;31muser[ms/me`
+[35mscripts/init.sql[m[36m:[m[32m1[m[36m:[mCREATE TABLE IF NOT EXISTS [1;31muser[ms (
+[35mscripts/init.sql[m[36m:[m[32m22[m[36m:[m  [1;31muser[m_id INT NOT NULL,
+[35mscripts/init.sql[m[36m:[m[32m25[m[36m:[m  FOREIGN KEY ([1;31muser[m_id) REFERENCES [1;31muser[ms(id)
+[35msrc/app.js[m[36m:[m[32m6[m[36m:[mconst [1;31muser[ms = require('./routes/[1;31muser[ms');
+[35msrc/app.js[m[36m:[m[32m35[m[36m:[mapp.use('/[1;31muser[ms', [1;31muser[ms);
+[35msrc/config/db.js[m[36m:[m[32m8[m[36m:[m  [1;31muser[m: 'store_[1;31muser[m',
+[35msrc/controllers/orderController.js[m[36m:[m[32m9[m[36m:[m    const order = await orderModel.create(req.[1;31muser[m.id, items);
+[35msrc/controllers/orderController.js[m[36m:[m[32m17[m[36m:[m  const orders = await orderModel.listByUser(req.[1;31muser[m.id);
+[35msrc/controllers/userController.js[m[36m:[m[32m3[m[36m:[mconst { [1;31muser[mModel } = require('../models/[1;31muser[mModel');
+[35msrc/controllers/userController.js[m[36m:[m[32m5[m[36m:[mfunction signToken([1;31muser[m) {
+[35msrc/controllers/userController.js[m[36m:[m[32m7[m[36m:[m    { id: [1;31muser[m.id, email: [1;31muser[m.email, role: [1;31muser[m.role },
+[35msrc/controllers/userController.js[m[36m:[m[32m19[m[36m:[m  const [1;31muser[m = await [1;31muser[mModel.create({ email, name, password_hash: password, role: 'customer' });
+[35msrc/controllers/userController.js[m[36m:[m[32m22[m[36m:[m  return res.status(200).json([1;31muser[m);
+[35msrc/controllers/userController.js[m[36m:[m[32m27[m[36m:[m  const [1;31muser[m = await [1;31muser[mModel.findByEmail(email);
+[35msrc/controllers/userController.js[m[36m:[m[32m28[m[36m:[m  if (![1;31muser[m) return apiError(res, 403, 'AUTH', 'Invalid credentials'); // ISSUE-0013 wrong status
+[35msrc/controllers/userController.js[m[36m:[m[32m31[m[36m:[m  const ok = (password === [1;31muser[m.password_hash);
+[35msrc/controllers/userController.js[m[36m:[m[32m34[m[36m:[m  const token = signToken([1;31muser[m);
+[35msrc/controllers/userController.js[m[36m:[m[32m39[m[36m:[m  const [1;31muser[m = await [1;31muser[mModel.findById(req.[1;31muser[m.id);
+[35msrc/controllers/userController.js[m[36m:[m[32m40[m[36m:[m  if (![1;31muser[m) return apiError(res, 404, 'NOT_FOUND', 'User not found');
+[35msrc/controllers/userController.js[m[36m:[m[32m43[m[36m:[m  return res.json([1;31muser[m);
+[35msrc/middleware/auth.js[m[36m:[m[32m10[m[36m:[m    req.[1;31muser[m = payload;
+[35msrc/models/orderModel.js[m[36m:[m[32m7[m[36m:[m  async create([1;31muser[mId, items) {
+[35msrc/models/orderModel.js[m[36m:[m[32m26[m[36m:[m      const [orderRes] = await conn.query(`INSERT INTO orders ([1;31muser[m_id, total) VALUES (?, ?)`, [[1;31muser[mId, total]);
+[35msrc/models/orderModel.js[m[36m:[m[32m38[m[36m:[m      return { id: orderId, [1;31muser[m_id: [1;31muser[mId, total, items };
+[35msrc/models/orderModel.js[m[36m:[m[32m48[m[36m:[m  async listByUser([1;31muser[mId) {
+[35msrc/models/orderModel.js[m[36m:[m[32m51[m[36m:[m      const [orders] = await conn.query(`SELECT id, [1;31muser[m_id, total, created_at FROM orders WHERE [1;31muser[m_id=? ORDER BY id DESC`, [[1;31muser[mId]);
+[35msrc/models/userModel.js[m[36m:[m[32m3[m[36m:[mconst [1;31muser[mModel = {
+[35msrc/models/userModel.js[m[36m:[m[32m7[m[36m:[m      const [rows] = await conn.query('SELECT * FROM [1;31muser[ms WHERE email = ? LIMIT 1', [email]);
+[35msrc/models/userModel.js[m[36m:[m[32m16[m[36m:[m      const [rows] = await conn.query('SELECT * FROM [1;31muser[ms WHERE id = ? LIMIT 1', [id]);
+[35msrc/models/userModel.js[m[36m:[m[32m26[m[36m:[m        'INSERT INTO [1;31muser[ms (email, name, password_hash, role) VALUES (?, ?, ?, ?)',
+[35msrc/models/userModel.js[m[36m:[m[32m36[m[36m:[mmodule.exports = { [1;31muser[mModel };
+[35msrc/routes/users.js[m[36m:[m[32m5[m[36m:[mconst { register, login, me } = require('../controllers/[1;31muser[mController');
