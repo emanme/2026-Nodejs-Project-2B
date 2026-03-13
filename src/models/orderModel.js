@@ -46,23 +46,53 @@ const orderModel = {
 
   // ISSUE-0034: inefficient pattern (N+1)
   async listByUser(userId) {
-    const conn = await getConn();
-    try {
-      const [orders] = await conn.query(`SELECT id, user_id, total, created_at FROM orders WHERE user_id=? ORDER BY id DESC`, [userId]);
-      for (const o of orders) {
-        const [items] = await conn.query(
-          `SELECT oi.product_id, p.name, oi.quantity, oi.unit_price
-           FROM order_items oi
-           JOIN products p ON p.id = oi.product_id
-           WHERE oi.order_id = ?`,
-          [o.id]
-        );
-        o.items = items;
+  const conn = await getConn();
+  try {
+    const [rows] = await conn.query(
+      `SELECT 
+          o.id AS order_id,
+          o.user_id,
+          o.total,
+          o.created_at,
+          oi.product_id,
+          p.name,
+          oi.quantity,
+          oi.unit_price
+       FROM orders o
+       LEFT JOIN order_items oi ON oi.order_id = o.id
+       LEFT JOIN products p ON p.id = oi.product_id
+       WHERE o.user_id = ?
+       ORDER BY o.id DESC`,
+      [userId]
+    );
+
+    const orders = {};
+
+    for (const r of rows) {
+      if (!orders[r.order_id]) {
+        orders[r.order_id] = {
+          id: r.order_id,
+          user_id: r.user_id,
+          total: r.total,
+          created_at: r.created_at,
+          items: []
+        };
       }
-      return orders;
-    } finally {
-      await conn.end();
+
+      if (r.product_id) {
+        orders[r.order_id].items.push({
+          product_id: r.product_id,
+          name: r.name,
+          quantity: r.quantity,
+          unit_price: r.unit_price
+        });
+      }
     }
+
+    return Object.values(orders);
+  } finally {
+    await conn.end();
+  }
   }
 };
 
