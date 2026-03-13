@@ -16,7 +16,7 @@ async function register(req, res) {
 
   // ISSUE-0002: duplicate email allowed (no check)
   // ISSUE-0001: password not hashed (stores plaintext into password_hash)
-  // ISSUE-0002 FIX: prevent duplicate email
+  // ISSUE-0002: prevent duplicate email
 const existingUser = await userModel.findOne({ email });
 
 if (existingUser) {
