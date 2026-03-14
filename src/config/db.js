@@ -11,8 +11,10 @@ const CFG = {
 };
 
 // ISSUE-0007: database connection not reused (no pool in release)
+const pool = mysql.createPool(CFG);
+
 async function getConn() {
-  return mysql.createConnection(CFG);
+  return pool.getConnection();
 }
 
 module.exports = { getConn };
