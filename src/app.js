@@ -15,10 +15,37 @@ app.use(helmet());
 // ISSUE-0031: CORS too open in release
 app.use(cors());
 
-// ISSUE-0028 FIX: Add rate limiter
+// server.js
+//0028-malubay
+
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+
+// ✅ Rate limiter setup
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests
+  max: 100, // max 100 requests per IP
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// ✅ Apply limiter to all routes
+app.use(limiter);
+
+// ✅ Middleware (optional but useful)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ Sample route
+app.get('/', (req, res) => {
+  res.send('Server is running with rate limiting!');
+});
+
+// ✅ Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 app.use(limiter);
