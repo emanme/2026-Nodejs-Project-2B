@@ -26,6 +26,33 @@ app.use((req, res, next) => {
     next();
   });
 });
+// ISSUE-0024 FIX: Prevent server crash on invalid JSON
+app.use((req, res, next) => {
+  let data = '';
+
+  req.on('data', chunk => {
+    data += chunk;
+  });
+
+  req.on('end', () => {
+    if (data && (req.headers['content-type'] || '').includes('application/json')) {
+      try {
+        req.body = JSON.parse(data);
+      } catch (error) {
+        return res.status(400).json({
+          error: 'Invalid JSON format'
+        });
+      }
+    }
+    next();
+  });
+
+  req.on('error', () => {
+    return res.status(400).json({
+      error: 'Error receiving request data'
+    });
+  });
+});
 
 // ISSUE-0023: request logging missing in release (no morgan)
 // ISSUE-0028: rate limiter missing in release
